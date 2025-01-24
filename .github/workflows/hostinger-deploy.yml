@@ -34,9 +34,9 @@ jobs:
           script_stop: true
           script: |
             cd domains
-            cd laravel-space.com
+            cd alam-aldyara.com
             git pull
-            php composer.phar install
+            composer2 update
             php artisan migrate --force
       - name: Install SSH key
         run: |
