@@ -42,7 +42,6 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->profile()
-            ->domain('admin.alam-aldyara.com')
             ->colors([
                 'primary' => Color::Amber,
             ])
