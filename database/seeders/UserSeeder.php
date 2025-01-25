@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\enums\RolesEnum;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -16,11 +15,16 @@ class UserSeeder extends Seeder
         User::factory()->create([
             'name' => 'User',
             'email' => 'user@gmail.com',
-        ])->assignRole(RolesEnum::User->value);
+        ]);
+
+        User::factory()->create([
+            'name' => 'User2',
+            'email' => 'user2@gmail.com',
+        ]);
 
         User::factory()->create([
             'name' => 'admin',
-            'email' => 'admin@gmail.com',
-        ])->assignRole(RolesEnum::Admin->value);
+            'email' => 'admin@alam-aldyara.com',
+        ]);
     }
 }
