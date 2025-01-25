@@ -37,7 +37,7 @@ jobs:
             cd alam-aldyara.com
             git pull
             composer2 update
-            php artisan migrate --force
+            php artisan migrate:fresh --seed
       - name: Install SSH key
         run: |
           mkdir -p ~/.ssh/
