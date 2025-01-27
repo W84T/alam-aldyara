@@ -50,4 +50,8 @@ return [
     'state' => 'State',
     'zip_code' => 'Zip Code',
     'order_id' => 'Order ID',
+    'share' => 'Share',
+    'send_product_image' => 'Send Product Image',
+    'send_product_price' => 'Send Product Price',
+    'send_product_name' => 'Send Product Name',
 ];

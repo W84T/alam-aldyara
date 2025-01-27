@@ -7,32 +7,44 @@ use App\Services\TelegramService;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\EditRecord\Concerns\Translatable;
 
 class EditProduct extends EditRecord
 {
+    use Translatable;
+
     protected static string $resource = ProductResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\Action::make('Send to Telegram')
-                ->icon('heroicon-o-paper-airplane')
-                ->color('primary')
-                ->modalHeading('Share Product on Telegram')
-                ->modalSubheading('Choose what to include in your Telegram message.')
+                ->label(__('form.share'))
+                ->icon('heroicon-o-share')
+                ->color('telegram')
                 ->form([
-                    Checkbox::make('send_name')->label('Include Product Name')->default(true),
-                    Checkbox::make('send_price')->label('Include Product Price')->default(true),
-                    Checkbox::make('send_images')->label('Include Product Images')->default(false),
-                    Textarea::make('custom_message')->label('Custom Message')->rows(3),
+                    Select::make('share')
+                        ->multiple()
+                        ->options([
+                            'send_product_name' => __('form.send_product_name'),
+                            'send_product_price' => __('form.send_product_price'),
+                            'send_product_image' => __('form.send_product_image'),
+                        ])
+                        ->default(['send_product_name', 'send_product_price']),
+
+                    Forms\Components\MarkdownEditor::make('custom_message'),
                 ])
                 ->action(fn (array $data) => $this->sendToTelegram($data)),
+
             Actions\LocaleSwitcher::make(),
             Actions\DeleteAction::make(),
         ];
+
     }
 
     public function sendToTelegram(array $data)
@@ -51,10 +63,10 @@ class EditProduct extends EditRecord
 
         // Build the message
         $message = "";
-        if ($data['send_name']) {
+        if (in_array('send_product_name', $data['share'])) {
             $message .= "🛍 *{$record->name}*\n";
         }
-        if ($data['send_price']) {
+        if (in_array('send_product_price', $data['share'])) {
             $message .= "💰 Price: {$record->price} USD\n";
         }
         if (!empty($data['custom_message'])) {
@@ -65,7 +77,7 @@ class EditProduct extends EditRecord
         $telegram->sendMessage($message);
 
         // If images are selected, send them
-        if ($data['send_images'] && $record->images) {
+        if (in_array('send_product_image', $data['share']) && $record->images) {
             foreach ($record->images as $image) {
                 $telegram->sendPhoto(url('storage/' . $image));
             }
@@ -77,4 +89,5 @@ class EditProduct extends EditRecord
             ->success()
             ->send();
     }
+
 }

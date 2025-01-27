@@ -48,5 +48,9 @@ return [
     'city' => 'المدينة',
     'state' => 'الولاية',
     'zip_code' => 'الرمز البريدي',
-    'order_id' => 'معرف الطلب'
+    'order_id' => 'معرف الطلب',
+    'share' => 'مشاركة',
+    'send_product_image' => 'إرفاق الصورة',
+    'send_product_price' => 'إرفاق السعر',
+    'send_product_name' => 'إرفاق إسم المنتح',
 ];
