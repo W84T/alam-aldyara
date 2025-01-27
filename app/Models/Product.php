@@ -19,9 +19,9 @@ class Product extends Model
         'description',
         'price',
         'is_active',
-        'is_feature',
+        'is_featured',
         'in_stock',
-        'on_sale',
+        'qr_code'
     ];
     public array $translatable = ['name', 'description'];
     protected $casts = [
@@ -33,6 +33,12 @@ class Product extends Model
 
     protected static function booted(): void
     {
+        // Handle QR URL creation after creating a new product
+        self::created(function (Product $product) {
+            $qr_url = config('app.url')."/product/{$product->id}";
+            $product->update(['qr_code' => $qr_url]);
+        });
+
         // Handle image deletion on record deletion
         self::deleted(function (Product $product) {
             if (is_array($product->images)) {

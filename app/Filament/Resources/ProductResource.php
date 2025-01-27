@@ -25,9 +25,12 @@ use Filament\Tables\Columns\TextColumn\TextColumnSize;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
+use LaraZeus\Popover\Tables\PopoverColumn;
+use LaraZeus\Qr\Facades\Qr;
 
 class ProductResource extends Resource
 {
@@ -107,14 +110,9 @@ class ProductResource extends Resource
                             ->label(__('form.is_active'))
                             ->default(true),
 
-                        Toggle::make('is_feature')
+                        Toggle::make('is_featured')
                             ->required()
                             ->label(__('form.is_featured'))
-                            ->default(false),
-
-                        Toggle::make('on_sale')
-                            ->required()
-                            ->label(__('form.on_sale'))
                             ->default(false),
                     ])
                 ])->columnSpan(1),
@@ -125,14 +123,19 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->searchable()
-                    ->label(__('form.product_name'))
-                    ->size(TextColumnSize::Medium),
+                PopoverColumn::make('name')
+                    ->trigger('hover')
+                    ->offset(0)
+                    ->placement('left')
+                    ->popOverMaxWidth('none')
+                    ->icon('heroicon-o-qr-code')
+                    ->content(fn (Model $record) => view('filament.qr_card', ['record' => $record])),
 
-                BadgeableColumn::make('name')
+//            ->content(fn (Model $record) => Qr::render($record->qr_code)),
+
+                BadgeableColumn::make('category.name')
                     ->suffixBadges([
-                        Badge::make('price')->label(fn($record) => $record->brand->name)->color('primary')->visible(true),
+                        Badge::make('brand.name')->label(fn($record) => $record->brand->name)->color('primary')->visible(true),
                         Badge::make('category.name')->label(fn($record) => $record->category->name)->color('primary')->visible(true),
                     ])
                     ->searchable()
@@ -148,14 +151,14 @@ class ProductResource extends Resource
 
                 ToggleColumn::make('in_stock')->label(__('form.in_stock')),
                 ToggleColumn::make('is_active')->label(__('form.is_active')),
-                ToggleColumn::make('on_sale')->label(__('form.on_sale')),
-                ToggleColumn::make('is_feature')->label(__('form.is_featured')),
+                ToggleColumn::make('is_featured')->label(__('form.is_featured')),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\DeleteAction::make()->label(false),
+                Tables\Actions\EditAction::make()->label(false),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

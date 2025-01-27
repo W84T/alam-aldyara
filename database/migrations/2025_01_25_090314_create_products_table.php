@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->boolean('in_stock')->default(true);
             $table->boolean('is_featured')->default(false);
+            $table->string('qr_code')->nullable();
             $table->timestamps();
         });
     }
