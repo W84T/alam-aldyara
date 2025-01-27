@@ -50,7 +50,14 @@ return [
     'zip_code' => 'الرمز البريدي',
     'order_id' => 'معرف الطلب',
     'share' => 'مشاركة',
-    'send_product_image' => 'إرفاق الصورة',
-    'send_product_price' => 'إرفاق السعر',
-    'send_product_name' => 'إرفاق إسم المنتح',
+    'send_product_image' => 'إرفاق صور المنتج',
+    'message'=> 'نص الرسالة',
+    'banner_details' => 'تفاصيل البانر',
+    'banner_images' => 'صور البانر',
+    'title' => 'العنوان',
+    'sub_title' => 'العنوان الفرعي',
+    'main_image' => 'الصورة الرئيسية',
+    'percentage' => 'خصم نسبة مئوية',
+    'fixed' => 'خصم ثابت',
+    'discount_type' => 'نوع الخصم'
 ];

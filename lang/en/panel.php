@@ -28,4 +28,6 @@ return [
     'shipped' => 'Shipped',
     'delivered' => 'Delivered',
     'cancelled' => 'Cancelled',
+    'banners' => 'Banners',
+    'banner' => 'Banner',
 ];

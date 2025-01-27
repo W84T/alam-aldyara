@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Api;
 use Telegram\Bot\FileUpload\InputFile;
 
@@ -28,9 +30,21 @@ class TelegramService
     {
         return $this->telegram->sendPhoto([
             'chat_id' => $this->channelId,
-            'photo' => InputFile::create($photoPath), // Properly upload image
+            'photo' => InputFile::create($photoPath),
             'caption' => $caption,
             'parse_mode' => 'Markdown',
         ]);
+    }
+
+    // New method to send media group (multiple images)
+    public function sendMediaGroup(array $media)
+    {
+        $response = $this->telegram->sendMediaGroup([
+            'chat_id' => $this->channelId,
+            'media' => json_encode($media),
+        ]);
+
+
+        return $response;
     }
 }

@@ -26,4 +26,6 @@ return [
     'shipped' => 'تم الشحن',
     'delivered' => 'تم التوصيل',
     'cancelled' => 'ملغي',
+    'banner' => 'بانر',
+    'banners' => 'بانرات'
 ];

@@ -11,7 +11,7 @@ class Banner extends Model
 {
     use HasFactory, HasTranslations;
 
-    protected $fillable = ['title', 'description', 'image'];
+    protected $fillable = ['title', 'description', 'image', 'is_active'];
     public array $translatable = ['title', 'description', 'image'];
 
     protected static function booted(): void{
@@ -32,6 +32,5 @@ class Banner extends Model
     protected $casts = [
         'title' => 'array',
         'description' => 'array',
-        'image' => 'array'
     ];
 }
