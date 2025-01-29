@@ -59,5 +59,11 @@ return [
     'main_image' => 'الصورة الرئيسية',
     'percentage' => 'خصم نسبة مئوية',
     'fixed' => 'خصم ثابت',
-    'discount_type' => 'نوع الخصم'
+    'discount_type' => 'نوع الخصم',
+    'value' =>  'القيمة',
+    'applied_to' => 'تطبيق الخصم على',
+    'start_date' => 'تاريخ البدء',
+    'end_date' => 'تاريح الإنتهاء',
+    'products' => 'منتجات',
+    'categories' => 'فئات',
 ];

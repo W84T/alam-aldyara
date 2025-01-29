@@ -27,5 +27,7 @@ return [
     'delivered' => 'تم التوصيل',
     'cancelled' => 'ملغي',
     'banner' => 'بانر',
-    'banners' => 'بانرات'
+    'banners' => 'بانرات',
+    'discount' => 'تخفيض',
+    'discounts' => 'تخفيضات',
 ];

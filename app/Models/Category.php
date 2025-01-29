@@ -31,7 +31,13 @@ class Category extends Model
             }
         });
     }
-    public function products(){
-        return $this->hasMany(Product::class);
+    public function discounts()
+    {
+        return $this->belongsToMany(Discount::class, 'discount_categories');
+    }
+
+    public function getActiveDiscountAttribute()
+    {
+        return $this->discounts()->where('is_active', true)->first();
     }
 }

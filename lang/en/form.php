@@ -61,4 +61,10 @@ return [
     'percentage' => 'Percentage',
     'fixed' => 'Fixed',
     'discount_type' => 'Discount Type',
+    'value' => 'Value',
+    'applied_to' => 'Applied To',
+    'start_date' => 'Start Date',
+    'end_date' => 'End Date',
+    'products' => 'Products',
+    'categories' => 'Categories',
 ];

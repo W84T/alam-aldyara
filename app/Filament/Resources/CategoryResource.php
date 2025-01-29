@@ -77,6 +77,7 @@ class CategoryResource extends Resource
                     ->label(__('form.brand'))
                     ->searchable(),
                 ToggleColumn::make('is_active')->label(__('form.is_active')),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

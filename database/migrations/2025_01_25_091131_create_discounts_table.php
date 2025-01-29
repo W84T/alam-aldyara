@@ -12,15 +12,13 @@ return new class extends Migration {
     {
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['percentage', 'fixed'])->default('percentage');
-            $table->enum('applied_to', ['category', 'product'])->default('category');
+            $table->string('name');
+            $table->enum('discount_type', ['fixed', 'percentage']);
             $table->decimal('value', 10, 2);
+            $table->enum('applies_to', ['product', 'category']);
+            $table->boolean('is_active')->default(false);
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->foreignId('product_id')->nullable()->constrained('products')->cascadeOnDelete();
-            $table->foreignId('category_id')->nullable()->constrained('categories')->cascadeOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }

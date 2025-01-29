@@ -4,16 +4,19 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DiscountResource\Pages;
 use App\Filament\Resources\DiscountResource\RelationManagers;
-use App\Models\Category;
 use App\Models\Discount;
-use App\Models\Product;
-use Filament\Forms\Components\DatePicker;
+use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DiscountResource extends Resource
 {
@@ -25,52 +28,58 @@ class DiscountResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('code')
-                    ->label(__('form.discount_code'))
-                    ->unique(ignoreRecord: true)
-                    ->nullable(),
+                TextInput::make('name')
+                    ->required()
+                    ->label(__('form.name'))
+                    ->maxLength(255),
 
-                Select::make('type')
+                Select::make('discount_type')
                     ->label(__('form.discount_type'))
                     ->options([
-                        'percentage' => __('form.percentage'),
                         'fixed' => __('form.fixed'),
+                        'percentage' => __('form.percentage'),
                     ])
                     ->required(),
 
                 TextInput::make('value')
-                    ->label(__('form.discount_value'))
+                    ->label(__('form.value'))
                     ->numeric()
                     ->required(),
 
-                DatePicker::make('start_date')
-                    ->label(__('form.discount_start_date'))
-                    ->required(),
+                Select::make('applies_to')
+                    ->label(__('form.applied_to'))
+                    ->options([
+                        'product' => __('form.products'),
+                        'category' => __('form.categories'),
+                    ])
+                    ->required()
+                    ->reactive(),
 
-                DatePicker::make('end_date')
-                    ->label(__('form.discount_end_date'))
-                    ->required(),
-
-                Select::make('category_id')
-                    ->label(__('form.discount_category'))
-                    ->options(Category::pluck('name', 'id'))
-                    ->searchable()
+                Select::make('products')
+                    ->label(__('form.products'))
+                    ->multiple()
+                    ->relationship('products', 'name')  // Correct relationship reference
                     ->preload()
-                    ->reactive()
-                    ->afterStateUpdated(fn ($set) => $set('product_id', null))
+                    ->visible(fn($get) => $get('applies_to') === 'product')
+                    ->options(fn () => \App\Models\Product::whereDoesntHave('discounts')->pluck('name', 'id')),
+
+                Select::make('categories')
+                    ->label(__('form.categories'))
+                    ->multiple()
+                    ->preload()
+                    ->relationship('categories', 'name') // Correct relationship reference
+                    ->visible(fn($get) => $get('applies_to') === 'category'),
+
+                Toggle::make('is_active')
+                    ->label(__('form.is_active'))
+                    ->default(false),
+
+                Forms\Components\DatePicker::make('start_date')
+                    ->label(__('form.start_date'))
                     ->nullable(),
 
-                Select::make('product_id')
-                    ->label(__('form.discount_products'))
-                    ->options(fn (callable $get) =>
-                    Product::whereDoesntHave('discounts', function ($query) {
-                        $query->where('is_active', true);
-                    })
-                        ->when($get('category_id'), fn ($query, $categoryId) => $query->where('category_id', $categoryId))
-                        ->pluck('name', 'id')
-                    )
-                    ->searchable()
-                    ->preload()
+                Forms\Components\DatePicker::make('end_date')
+                    ->label(__('form.end_date'))
                     ->nullable(),
             ]);
     }
@@ -79,10 +88,35 @@ class DiscountResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('name')
+                    ->label(__('form.name'))
+                    ->sortable(),
+                TextColumn::make('discount_type')
+                    ->label(__('form.discount_type'))
+                    ->formatStateUsing(fn($state) => __("form.{$state}"))
+                    ->sortable(),
+                TextColumn::make('value')
+                    ->label(__('form.value'))
+                    ->formatStateUsing(fn($state, $record) => $record->discount_type === 'fixed'
+                        ? $state . '$'
+                        : $state . '%'),
+                TextColumn::make('applies_to')->sortable()
+                    ->label(__('form.is_active')),
+                TextColumn::make('start_date')->sortable(),
+                TextColumn::make('end_date')->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('discount_type')
+                    ->options([
+                        'fixed' => 'Fixed Amount',
+                        'percentage' => 'Percentage',
+                    ]),
+                SelectFilter::make('applies_to')
+                    ->options([
+                        'product' => 'Product',
+                        'category' => 'Category',
+                        'bulk' => 'Bulk Purchase',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -97,7 +131,7 @@ class DiscountResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+           //
         ];
     }
 
@@ -108,5 +142,16 @@ class DiscountResource extends Resource
             'create' => Pages\CreateDiscount::route('/create'),
             'edit' => Pages\EditDiscount::route('/{record}/edit'),
         ];
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('panel.discount');
+    }
+
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('panel.discounts');
     }
 }

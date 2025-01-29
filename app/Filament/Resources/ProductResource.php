@@ -100,11 +100,8 @@ class ProductResource extends Resource
                     ->icon('heroicon-o-qr-code')
                     ->content(fn(Model $record) => view('filament.qr_card', ['record' => $record])),
 
-//            ->content(fn (Model $record) => Qr::render($record->qr_code)),
-
                 BadgeableColumn::make('category.name')
                     ->suffixBadges([
-                        Badge::make('brand.name')->label(fn($record) => $record->brand->name)->color('primary')->visible(true),
                         Badge::make('category.name')->label(fn($record) => $record->category->name)->color('primary')->visible(true),
                     ])
                     ->searchable()
@@ -112,11 +109,28 @@ class ProductResource extends Resource
                     ->sortable(),
 
 
+                TextColumn::make('name')->sortable(),
+
                 TextColumn::make('price')
                     ->label(__('form.product_price'))
-                    ->money('USD') // Keep the correct currency format
-                    ->formatStateUsing(fn($state) => App::getLocale() === 'ar' ? $state . ' دولار' : '$' . $state) // Append 'دولار' when Arabic
+                    ->money('USD')
+                    ->formatStateUsing(function($state, $record) {
+
+                        $activeDiscount = $record->discounts()
+                            ->where('discount_products.is_active', true)
+                            ->first();
+
+                        if ($activeDiscount) {
+                            $discountedPrice = $state - ($state * $activeDiscount->value / 100); // Assuming it's a percentage discount
+                            return '<span style="text-decoration: line-through; font-size: 14px"">' . $state . '$</span><br>' . $discountedPrice . '$';
+                        }
+
+                        // If no discount, just show the regular price
+                        return $state;
+                    })
+                    ->html()
                     ->size(TextColumnSize::Medium),
+
 
                 ToggleColumn::make('in_stock')->label(__('form.in_stock')),
                 ToggleColumn::make('is_active')->label(__('form.is_active')),
@@ -126,7 +140,9 @@ class ProductResource extends Resource
                 //
             ])
             ->actions([
+
                 ActionGroup::make([
+
                     Action::make('Send to Telegram')
                         ->label(__('form.share'))
                         ->icon('heroicon-s-share')
@@ -202,12 +218,6 @@ class ProductResource extends Resource
                             ->searchable()
                             ->preload()
                             ->relationship('category', 'name'),
-
-                        Select::make('brand_id')
-                            ->label(__('form.product_brand'))
-                            ->searchable()
-                            ->preload()
-                            ->relationship('brand', 'name'),
                     ]),
                     Section::make(__('panel.statuses'))->schema([
                         Toggle::make('in_stock')
@@ -232,7 +242,7 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\DiscountsRelationManager::class
         ];
     }
 

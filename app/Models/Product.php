@@ -71,16 +71,15 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function brand(){
-        return $this->belongsTo(Brand::class);
-    }
-
     public function orderItems(){
         return $this->hasMany(OrderItem::class);
     }
 
     public function discounts()
     {
-        return $this->hasMany(Discount::class);
+        return $this->belongsToMany(Discount::class, 'discount_products')
+            ->withPivot('is_active')
+            ->withTimestamps();
     }
+
 }

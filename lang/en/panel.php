@@ -30,4 +30,6 @@ return [
     'cancelled' => 'Cancelled',
     'banners' => 'Banners',
     'banner' => 'Banner',
+    'discount' => 'Discount',
+    'discounts' => 'Discounts',
 ];
